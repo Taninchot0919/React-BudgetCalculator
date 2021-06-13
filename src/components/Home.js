@@ -20,6 +20,9 @@ const Home = () => {
   // Single Amount
   const [amount, setAmount] = useState("");
 
+  // Alert
+  const [alert, setAlert] = useState({ show: false });
+
   // *************************** Function *************************************
   const handleCharge = (e) => {
     console.log(`Charge : ${e.target.value}`);
@@ -31,6 +34,14 @@ const Home = () => {
     setAmount(e.target.value);
   };
 
+  const handleAlert = ({ type, text }) => {
+    // หมายความว่าเซ็ต Object ให้ Alert มี show เป็น true แล้วก็ใส่ type กับ text ลงไปใน Object
+    setAlert({ show: true, type, text });
+    setTimeout(() => {
+      setAlert({ show: false });
+    }, 3000);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(`Submit : ${charge} , ${amount}`);
@@ -39,11 +50,20 @@ const Home = () => {
       console.log(newExpense);
       // เพื่อเป็นการนำ expense ของเก่าแล้วนำมาต่อดว้ยของใหม่
       setExpense([...expenses, newExpense]);
+      setCharge("");
+      setAmount("");
+      handleAlert({ type: "green", text: "Item Added" });
+    } else {
+      handleAlert({
+        type: "red",
+        text: "Charge can't be empty and Amount Value has to be more than zero",
+      });
     }
   };
 
   return (
     <div>
+      {alert.show && <Alert type={alert.type} text={alert.text} />}
       <Alert />
       <h2 className="text-center text-3xl font-bold tracking-widest">
         Budget Calculator
