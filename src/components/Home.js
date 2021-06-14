@@ -4,11 +4,16 @@ import ExpenseForm from "./ExpenseForm";
 import ExpenseList from "./ExpenseList";
 import { v4 as uuid } from "uuid";
 
-const initArrayValue = [
-  { id: uuid(), charge: "rent", amount: 1600 },
-  { id: uuid(), charge: "car payment", amount: 400 },
-  { id: uuid(), charge: "credit card bill", amount: 1200 },
-];
+// const initArrayValue = [
+//   { id: uuid(), charge: "rent", amount: 1600 },
+//   { id: uuid(), charge: "car payment", amount: 400 },
+//   { id: uuid(), charge: "credit card bill", amount: 1200 },
+// ];
+
+// Init Value
+const initialExpenses = localStorage.getItem("expenses")
+  ? JSON.parse(localStorage.getItem("expenses"))
+  : [];
 
 const Home = () => {
   // All Expense
@@ -22,6 +27,12 @@ const Home = () => {
 
   // Alert
   const [alert, setAlert] = useState({ show: false });
+
+  // Edit
+  const [isEdit, setIsEdit] = useState(false);
+
+  // Edit Item
+  const [id, setId] = useState(0);
 
   // *************************** Function *************************************
   const handleCharge = (e) => {
@@ -46,19 +57,51 @@ const Home = () => {
     e.preventDefault();
     console.log(`Submit : ${charge} , ${amount}`);
     if (charge !== "" && amount > 0) {
-      const newExpense = { id: uuid(), charge: charge, amount: amount };
-      console.log(newExpense);
-      // เพื่อเป็นการนำ expense ของเก่าแล้วนำมาต่อดว้ยของใหม่
-      setExpense([...expenses, newExpense]);
+      if (isEdit) {
+        let tempExpenses = expenses.map((item) => {
+          return item.id == id ? { ...item, charge, amount } : item;
+        });
+        setExpense(tempExpenses);
+        setIsEdit(false);
+      } else {
+        const newExpense = { id: uuid(), charge: charge, amount: amount };
+        console.log(newExpense);
+        // เพื่อเป็นการนำ expense ของเก่าแล้วนำมาต่อดว้ยของใหม่
+        setExpense([...expenses, newExpense]);
+        handleAlert({ type: "green", text: "Item Added" });
+      }
       setCharge("");
       setAmount("");
-      handleAlert({ type: "green", text: "Item Added" });
     } else {
       handleAlert({
         type: "red",
         text: "Charge can't be empty and Amount Value has to be more than zero",
       });
     }
+  };
+
+  const clearItems = () => {
+    console.log("Clear All Items");
+    setExpense([]);
+  };
+
+  const handleDelete = (id) => {
+    console.log(`Delete ${id}`);
+    const tempExpenses = expenses.filter((item) => item.id !== id);
+    setExpense(tempExpenses);
+    handleAlert({ type: "red", text: "Item has been deleted" });
+  };
+
+  const handleEdit = (id) => {
+    console.log(`Edit ${id}`);
+    let expense = expenses.find((item) => item.id === id);
+    console.log(expense);
+    const oldCharge = expense.charge;
+    const oldAmount = expense.amount;
+    setIsEdit(true);
+    setCharge(oldCharge);
+    setAmount(oldAmount);
+    setId(id);
   };
 
   return (
@@ -75,8 +118,14 @@ const Home = () => {
           handleCharge={handleCharge}
           handleAmount={handleAmount}
           handleSubmit={handleSubmit}
+          isEdit={isEdit}
         />
-        <ExpenseList expenses={expenses} />
+        <ExpenseList
+          expenses={expenses}
+          clearItems={clearItems}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+        />
       </div>
       <h1 className="text-center text-xl font-bold">
         Total spending :{" "}

@@ -7,6 +7,7 @@ const ExpenseForm = ({
   handleCharge,
   handleAmount,
   handleSubmit,
+  isEdit,
 }) => {
   return (
     <div className="flex justify-center">
@@ -35,7 +36,7 @@ const ExpenseForm = ({
         </div>
         <div className="flex item-center justify-center mt-5">
           <button className="px-3 py-2 bg-red-500 flex items-center text-white">
-            Submit <MdSend />
+            {isEdit ? "Edit" : "Send"} <MdSend className="ml-3" />
           </button>
         </div>
       </form>
