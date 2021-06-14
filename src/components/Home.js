@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Alert from "./Alert";
 import ExpenseForm from "./ExpenseForm";
 import ExpenseList from "./ExpenseList";
@@ -11,7 +11,7 @@ import { v4 as uuid } from "uuid";
 // ];
 
 // Init Value
-const initialExpenses = localStorage.getItem("expenses")
+const initArrayValue = localStorage.getItem("expenses")
   ? JSON.parse(localStorage.getItem("expenses"))
   : [];
 
@@ -36,12 +36,12 @@ const Home = () => {
 
   // *************************** Function *************************************
   const handleCharge = (e) => {
-    console.log(`Charge : ${e.target.value}`);
+    // console.log(`Charge : ${e.target.value}`);
     setCharge(e.target.value);
   };
 
   const handleAmount = (e) => {
-    console.log(`Amount : ${e.target.value}`);
+    // console.log(`Amount : ${e.target.value}`);
     setAmount(e.target.value);
   };
 
@@ -59,7 +59,7 @@ const Home = () => {
     if (charge !== "" && amount > 0) {
       if (isEdit) {
         let tempExpenses = expenses.map((item) => {
-          return item.id == id ? { ...item, charge, amount } : item;
+          return item.id === id ? { ...item, charge, amount } : item;
         });
         setExpense(tempExpenses);
         setIsEdit(false);
@@ -103,6 +103,12 @@ const Home = () => {
     setAmount(oldAmount);
     setId(id);
   };
+
+  // *************************** useEffect *************************************
+  useEffect(() => {
+    console.log("Use Effect was called");
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+  }, [expenses]);
 
   return (
     <div>
